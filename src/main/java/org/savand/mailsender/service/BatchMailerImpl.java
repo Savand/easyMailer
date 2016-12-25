@@ -32,11 +32,15 @@ public class BatchMailerImpl implements IBatchMailer{
 
   @Override
   public boolean sentMail2DbUsers() throws BatchMailException {
+	
+	boolean mailSuccessfullySent = false;
     List<User> users = null;
     
     try {
       users = userDao.getUsers();
     } catch (SQLException e) {
+        if (users == null)
+      	  System.exit(e.getErrorCode());
       throw new BatchMailException(e.getMessage());
     }
     
@@ -57,13 +61,14 @@ public class BatchMailerImpl implements IBatchMailer{
         
         
         mailSender.sendMail2Address(user.getEmail(), emailBody.toString());
+        mailSuccessfullySent = true;
         
       } catch (IOException e) {
         throw new BatchMailException(e.getMessage());
       }
     }
     
-    return false;
+    return mailSuccessfullySent;
   }
   
   public static void main(String[] args) throws BatchMailException {
